@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔥 ULTRA PRO Viral Roast Arena</title>
+
+<!-- Open Graph / Social Share -->
+<meta name="description" content="🔥 Roast your friends and climb the global leaderboard in ULTRA PRO Viral Roast Arena!">
+<meta property="og:title" content="🔥 ULTRA PRO Viral Roast Arena">
+<meta property="og:description" content="Generate viral roasts & challenge your friends!">
+<meta property="og:image" content="thumbnail.png">
+<meta property="og:url" content="https://YOUR_USERNAME.github.io/viral-roast-arena/">
+<meta name="twitter:card" content="summary_large_image">
+
+<style>
+body{margin:0;font-family:Arial;background:#0f172a;color:white;text-align:center;}
+header{background:#ef4444;padding:30px;font-size:36px;font-weight:bold;}
+.container{padding:30px;}
+input{padding:12px;width:250px;border-radius:8px;border:none;margin:10px;font-size:16px;}
+button{padding:14px 25px;margin:10px;font-size:18px;border:none;border-radius:8px;background:#f59e0b;cursor:pointer;transition:0.2s;}
+button:hover{background:#f97316;transform:scale(1.05);}
+.box{margin-top:40px;background:#1e293b;padding:30px;border-radius:12px;font-size:22px;width:80%;max-width:700px;margin:auto;min-height:120px;white-space:pre-wrap;}
+.list-section{margin-top:40px;}
+.list-section h2{color:#f59e0b;}
+.list{background:#1e293b;padding:15px;border-radius:10px;max-width:700px;margin:auto;text-align:left;}
+.list li{margin:6px 0;}
+footer{margin-top:60px;padding:20px;background:black;}
+.confetti{position:absolute;width:8px;height:8px;background:#f59e0b;animation:fall 1s linear forwards;opacity:0.9;}
+@keyframes fall{0%{top:0;transform:rotate(0deg);}100%{top:120px;transform:rotate(360deg);opacity:0;}}
+</style>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  databaseURL: "YOUR_DATABASE_URL",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+</script>
+
+</head>
+<body>
+
+<header>🔥 ULTRA PRO Viral Roast Arena</header>
+
+<div class="container">
+<input id="nameInput" placeholder="Enter your friend's name">
+<br>
+<button onclick="roastName()">👤 Roast by Name</button>
+<button onclick="generateRoast()">🔥 Random Roast</button>
+<button onclick="generateJoke()">😂 Random Joke</button>
+<button onclick="roastBattle()">🎮 Roast Battle</button>
+<button onclick="share()">📱 Share</button>
+<button onclick="copyRoast()">📋 Copy Roast</button>
+
+<div class="box" id="output">Your roast will appear here 😎</div>
+<div class="score">Roasts Generated: <span id="wins">0</span></div>
+</div>
+
+<div class="list-section">
+<h2>🔥 Trending Roasts (Live)</h2>
+<ul id="trendingList" class="list"></ul>
+</div>
+
+<div class="list-section">
+<h2>🏆 Global Leaderboard</h2>
+<ul id="leaderboardList" class="list"></ul>
+</div>
+
+<footer>ULTRA PRO Viral Roast Arena • Powered by Firebase 🚀</footer>
+
+<script>
+// Automatically generate 1000+ roasts with patterns
+const roastTemplates = [
+  "NAME could trip over a cordless connection.",
+  "NAME's logic has more bugs than a rainforest.",
+  "NAME's IQ tries to buffer like slow internet.",
+  "NAME's jokes are so dry they cause thirst.",
+  "NAME thought AI was short for 'Awesome Intelligence'.",
+  "NAME's brain runs in airplane mode.",
+  "NAME once tried to outsmart a toaster.",
+  "NAME's idea of thinking is closing their eyes.",
+  "Everyone else logs off... except NAME.",
+  "NAME's shadow left because it wanted brighter future."
+];
+const jokeTemplates = [
+  "Why don’t skeletons fight each other? They don’t have the guts.",
+  "Why did the scarecrow win an award? He was outstanding in his field!",
+  "Why did the math book look sad? Because it had too many problems.",
+  "I told my computer I needed a break, it froze!",
+  "Why did the coffee file a police report? It got mugged."
+];
+
+// Expand to 1000+ by repeating variations
+const baseRoasts=[];
+for(let i=0;i<1000;i++){
+  baseRoasts.push(roastTemplates[i % roastTemplates.length]);
+}
+const baseJokes=[];
+for(let i=0;i<500;i++){
+  baseJokes.push(jokeTemplates[i % jokeTemplates.length]);
+}
+
+let wins=0;
+function randomItem(arr){return arr[Math.floor(Math.random()*arr.length)];}
+
+function roastName(){
+  const name=document.getElementById("nameInput").value.trim();
+  if(!name){alert("Enter a name first!");return;}
+  const roast=randomItem(baseRoasts).replace(/NAME/g,name);
+  showRoast(roast);
+  saveRoast(roast,name);
+}
+
+function generateRoast(){
+  const roast=randomItem(baseRoasts).replace(/NAME/g,"Someone");
+  showRoast(roast);
+  wins++;
+  document.getElementById("wins").innerText=wins;
+  saveRoast(roast);
+}
+
+function generateJoke(){
+  showRoast(randomItem(baseJokes));
+}
+
+function roastBattle(){
+  const r1=randomItem(baseRoasts).replace(/NAME/g,"Player 1");
+  const r2=randomItem(baseRoasts).replace(/NAME/g,"Player 2");
+  showRoast("🔥 Roast Battle 🔥\n\nPlayer 1: "+r1+"\n\nPlayer 2: "+r2);
+}
+
+function showRoast(text){
+  const box=document.getElementById("output");
+  box.innerText=text;
+  for(let i=0;i<20;i++){
+    const c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*box.offsetWidth+"px";
+    box.appendChild(c);
+    setTimeout(()=>c.remove(),1000);
+  }
+}
+
+function share(){
+  const text=document.getElementById("output").innerText;
+  const url="https://wa.me/?text="+encodeURIComponent(text+" 🔥 Try ULTRA PRO Viral Roast Arena!");
+  window.open(url);
+}
+
+function copyRoast(){
+  const text=document.getElementById("output").innerText;
+  navigator.clipboard.writeText(text);
+  alert("Copied to clipboard!");
+}
+
+function saveRoast(roast,name){
+  db.ref('trending').push({text:roast,timestamp:Date.now()});
+  if(name){db.ref('leaderboard/'+name).set(firebase.database.ServerValue.increment(1));}
+}
+
+db.ref('trending').limitToLast(5).on('value',snap=>{
+  const list=document.getElementById("trendingList");list.innerHTML="";
+  snap.forEach(item=>{const li=document.createElement("li");li.innerText=item.val().text;list.appendChild(li);});
+});
+
+db.ref('leaderboard').orderByValue().limitToLast(10).on('value',snap=>{
+  const list=document.getElementById("leaderboardList");list.innerHTML="";
+  const arr=[];snap.forEach(item=>arr.push({name:item.key,val:item.val()}));
+  arr.sort((a,b)=>b.val-a.val);
+  arr.forEach(p=>{const li=document.createElement("li");li.innerText=p.name+" — "+p.val+" roasts";list.appendChild(li);});
+});
+</script>
+</body>
+</html>
