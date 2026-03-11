@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔥 ULTRA Viral Roast Arena LIVE</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0f172a;
+  color:white;
+  text-align:center;
+}
+header{
+  background:#ef4444;
+  padding:30px;
+  font-size:36px;
+  font-weight:bold;
+}
+.container{
+  padding:30px;
+}
+input{
+  padding:12px;
+  width:250px;
+  border-radius:8px;
+  border:none;
+  margin:10px;
+  font-size:16px;
+}
+button{
+  padding:14px 25px;
+  margin:10px;
+  font-size:18px;
+  border:none;
+  border-radius:8px;
+  background:#f59e0b;
+  cursor:pointer;
+  transition:0.2s;
+}
+button:hover{
+  background:#f97316;
+  transform:scale(1.05);
+}
+.box{
+  margin-top:40px;
+  background:#1e293b;
+  padding:30px;
+  border-radius:12px;
+  font-size:22px;
+  width:80%;
+  max-width:700px;
+  margin-left:auto;
+  margin-right:auto;
+  min-height:100px;
+  position:relative;
+}
+.score{
+  font-size:20px;
+  margin-top:20px;
+}
+.list-section{
+  margin-top:40px;
+}
+.list-section h2{
+  color:#f59e0b;
+}
+.list{
+  background:#1e293b;
+  padding:15px;
+  border-radius:10px;
+  max-width:700px;
+  margin:auto;
+  text-align:left;
+}
+.list li{
+  margin:6px 0;
+}
+footer{
+  margin-top:60px;
+  padding:20px;
+  background:black;
+}
+.confetti{
+  position:absolute;
+  width:10px;
+  height:10px;
+  background: #f59e0b;
+  animation: fall 1s linear forwards;
+  opacity:0.9;
+}
+@keyframes fall{
+  0%{top:0; transform:rotate(0deg);}
+  100%{top:100px; transform:rotate(360deg); opacity:0;}
+}
+</style>
+
+<!-- Firebase -->
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+  // 🔹 Replace with your Firebase project config
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    databaseURL: "YOUR_DATABASE_URL",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+</script>
+
+</head>
+<body>
+
+<header>🔥 ULTRA Viral Roast Arena LIVE</header>
+
+<div class="container">
+<input id="nameInput" placeholder="Enter your friend's name">
+<br>
+<button onclick="roastName()">👤 Roast Name</button>
+<button onclick="generateRoast()">🔥 Random Roast</button>
+<button onclick="generateJoke()">😂 Random Joke</button>
+<button onclick="roastBattle()">🎮 Roast Battle</button>
+<button onclick="share()">📱 Share</button>
+<button onclick="copyRoast()">📋 Copy Roast</button>
+
+<div class="box" id="output">Your roast will appear here 😎</div>
+<div class="score">Roasts Generated: <span id="wins">0</span></div>
+</div>
+
+<div class="list-section">
+<h2>🔥 Trending Roasts</h2>
+<ul id="trendingList" class="list"></ul>
+</div>
+
+<div class="list-section">
+<h2>🏆 Top Players</h2>
+<ul id="leaderboardList" class="list"></ul>
+</div>
+
+<footer>ULTRA Viral Roast Arena LIVE • Built with HTML, JS & Firebase 🚀</footer>
+
+<script>
+// Session data
+let wins = 0;
+
+// Preloaded roasts
+const roasts = [
+"NAME has two brain cells and both are on vacation.",
+"NAME is living proof that WiFi signals travel faster than thoughts.",
+"NAME would lose a staring contest with a mirror.",
+"NAME tried to download common sense but the file was missing.",
+"If laziness were a job NAME would still be unemployed.",
+"NAME's phone battery lasts longer than their attention span.",
+"NAME once tried to climb a glass wall to see what's on the other side.",
+"NAME is the reason instructions exist.",
+"NAME's brain is like Internet Explorer… slow and outdated.",
+"NAME brings everyone joy… when they leave.",
+"NAME's jokes are so dry even deserts are jealous.",
+"NAME tried to Google intelligence but got no results.",
+"NAME could trip over a wireless connection.",
+"NAME's shadow left because it wanted a brighter future.",
+"NAME's brain works like dial-up internet.",
+"NAME tried to charge their phone with a potato.",
+"NAME once locked themselves out of a cordless phone.",
+"NAME could hide their own Easter eggs.",
+"NAME's GPS says 'recalculating life choices'.",
+"NAME once tried to microwave cereal."
+];
+
+// Preloaded jokes
+const jokes = [
+"Why don't programmers like nature? Too many bugs.",
+"Why did the computer go to therapy? It had too many bytes.",
+"I told my computer I needed a break… it froze.",
+"Why was the JavaScript developer sad? Because he didn't Node how to Express himself.",
+"Why do programmers prefer dark mode? Because light attracts bugs.",
+"What do computers snack on? Microchips.",
+"Why was the computer cold? It forgot to close Windows.",
+"Why did the developer go broke? Because he used up all his cache.",
+"Why did the smartphone need glasses? It lost its contacts.",
+"Why did the computer sneeze? It had a virus."
+];
+
+// Helpers
+function randomItem(array){ return array[Math.floor(Math.random()*array.length)]; }
+
+// Roast by name
+function roastName(){
+  const name = document.getElementById("nameInput").value.trim();
+  if(!name){ alert("Enter a name first!"); return; }
+  const roast = randomItem(roasts).replace("NAME",name);
+  showRoast(roast);
+  db.ref('trending').push({ roast: roast, timestamp: Date.now() });
+  db.ref('leaderboard/'+name).set(firebase.database.ServerValue.increment(1));
+}
+
+// Random roast
+function generateRoast(){
+  const roast = randomItem(roasts).replace("NAME","Someone");
+  showRoast(roast);
+  wins++;
+  document.getElementById("wins").innerText = wins;
+  db.ref('trending').push({ roast: roast, timestamp: Date.now() });
+}
+
+// Random joke
+function generateJoke(){
+  const joke = randomItem(jokes);
+  showRoast(joke);
+}
+
+// Roast battle
+function roastBattle(){
+  const roast1 = randomItem(roasts).replace("NAME","Player 1");
+  const roast2 = randomItem(roasts).replace("NAME","Player 2");
+  const battleText = "🔥 Roast Battle 🔥\n\nPlayer 1: "+roast1+"\n\nPlayer 2: "+roast2;
+  showRoast(battleText);
+}
+
+// Show roast + confetti
+function showRoast(text){
+  const box = document.getElementById("output");
+  box.innerText = text;
+  // confetti
+  for(let i=0;i<20;i++){
+    const c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*box.offsetWidth+"px";
+    box.appendChild(c);
+    setTimeout(()=>{c.remove();},1000);
+  }
+}
+
+// Share
+function share(){
+  const text = document.getElementById("output").innerText;
+  const url = "https://wa.me/?text=" + encodeURIComponent(text+" 🔥 Try ULTRA Viral Roast Arena LIVE!");
+  window.open(url);
+}
+
+// Copy
+function copyRoast(){
+  const text = document.getElementById("output").innerText;
+  navigator.clipboard.writeText(text);
+  alert("Roast copied!");
+}
+
+// Render trending roasts
+db.ref('trending').limitToLast(5).on('value', snapshot => {
+  const list = document.getElementById('trendingList');
+  list.innerHTML = '';
+  snapshot.forEach(item=>{
+    const li=document.createElement('li');
+    li.innerText=item.val().roast;
+    list.appendChild(li);
+  });
+});
+
+// Render leaderboard
+db.ref('leaderboard').orderByValue().limitToLast(10).on('value', snapshot => {
+  const list=document.getElementById('leaderboardList');
+  list.innerHTML='';
+  const arr=[];
+  snapshot.forEach(item=>{
+    arr.push({name:item.key,value:item.val()});
+  });
+  arr.sort((a,b)=>b.value-a.value);
+  arr.forEach(p=>{
+    const li=document.createElement('li');
+    li.innerText=p.name+" — "+p.value+" roasts";
+    list.appendChild(li);
+  });
+});
+</script>
+
+</body>
+</html>
